@@ -1,44 +1,136 @@
-<div class="jumbotron">
-    <h1><?php echo sprintf($this->translate('Welcome to %sZend Framework 2%s'), '<span class="zf-green">', '</span>') ?></h1>
-    <p><?php echo sprintf($this->translate('Congratulations! You have successfully installed the %sZF2 Skeleton Application%s. You are currently running Zend Framework version %s. This skeleton can serve as a simple starting point for you to begin building your application on ZF2.'), '<a href="https://github.com/zendframework/ZendSkeletonApplication" target="_blank">', '</a>', \Zend\Version\Version::VERSION) ?></p>
-    <p><a class="btn btn-success btn-lg" href="https://github.com/zendframework/zf2" target="_blank"><?php echo $this->translate('Fork Zend Framework 2 on GitHub') ?> &raquo;</a></p>
-</div>
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				
 
-<div class="row">
+				function verificaTabuleiro(peca)
+				{
 
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"><?php echo $this->translate('Follow Development') ?></h3>
-            </div>
-            <div class="panel-body">
-                <p><?php echo sprintf($this->translate('Zend Framework 2 is under active development. If you are interested in following the development of ZF2, there is a special ZF2 portal on the official Zend Framework website which provides links to the ZF2 %swiki%s, %sdev blog%s, %sissue tracker%s, and much more. This is a great resource for staying up to date with the latest developments!'), '<a href="http://framework.zend.com/wiki/display/ZFDEV2/Home">', '</a>', '<a href="http://framework.zend.com/zf2/blog">', '</a>', '<a href="https://github.com/zendframework/zf2/issues">', '</a>') ?></p>
-                <p><a class="btn btn-success pull-right" href="http://framework.zend.com/zf2" target="_blank"><?php echo $this->translate('ZF2 Development Portal') ?> &raquo;</a></p>
-            </div>
-        </div>
-    </div>
+					// Lógica para ganhar verificar se ganhou um jogo
+					// Lógica nas linhas
+					if(($('#cell1').find("."+peca).length > 0) && ($('#cell2').find("."+peca).length > 0) && ($('#cell3').find("."+peca).length > 0)){
+							alert(peca+' ganhou');
+							return true;
+						}else if(($('#cell4').find("."+peca).length > 0) && ($('#cell5').find("."+peca).length > 0) && ($('#cell6').find("."+peca).length > 0)){
+								alert(peca+' ganhou');
+								return true;
+							}else if(($('#cell7').find("."+peca).length > 0) && ($('#cell8').find("."+peca).length > 0) && ($('#cell9').find("."+peca).length > 0)){
+									alert(peca+' ganhou');
+									return true;
+								// Lógica nas colunas
+								}else if(($('#cell1').find("."+peca).length > 0) && ($('#cell4').find("."+peca).length > 0) && ($('#cell7').find("."+peca).length > 0)){
+										alert(peca+' ganhou');
+										return true;
+									}else if(($('#cell2').find("."+peca).length > 0) && ($('#cell5').find("."+peca).length > 0) && ($('#cell8').find("."+peca).length > 0)){
+											alert(peca+' ganhou');
+											return true;
+										}else if(($('#cell3').find("."+peca).length > 0) && ($('#cell6').find("."+peca).length > 0) && ($('#cell9').find("."+peca).length > 0)){
+												alert(peca+' ganhou');
+												return true;
+											
+											}else if(($('#cell1').find("."+peca).length > 0) && ($('#cell5').find("."+peca).length > 0) && ($('#cell9').find("."+peca).length > 0)){
+													alert(peca+' ganhou');
+													return true;
+												}else if(($('#cell3').find("."+peca).length > 0) && ($('#cell5').find("."+peca).length > 0) && ($('#cell7').find("."+peca).length > 0)){
+														alert(peca+' ganhou');
+														return true;
+													}else{
+															return false
+													}
+				}
 
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"><?php echo $this->translate('Discover Modules') ?></h3>
-            </div>
-            <div class="panel-body">
-                <p><?php echo sprintf($this->translate('The community is working on developing a community site to serve as a repository and gallery for ZF2 modules. The project is available %son GitHub%s. The site is currently live and currently contains a list of some of the modules already available for ZF2.'), '<a href="https://github.com/zendframework/modules.zendframework.com">', '</a>') ?></p>
-                <p><a class="btn btn-success pull-right" href="http://modules.zendframework.com/" target="_blank"><?php echo $this->translate('Explore ZF2 Modules') ?> &raquo;</a></p>
-            </div>
-        </div>
-    </div>
+				function jogadaComputador(numero, pecaComputador, numeroJogador)
+				{
+					// $('#cell'+numero).append("<div class="+pecaComputador+"></div>");
+					// Coloca o número do espaço clicado no array 
+					tabuleiro[numero] = pecaComputador;
+					nivelDificil(numeroJogador, pecaComputador);
+				}
 
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"><?php echo $this->translate('Help &amp; Support') ?></h3>
-            </div>
-            <div class="panel-body">
-                <p><?php echo sprintf($this->translate('If you need any help or support while developing with ZF2, you may reach us via IRC: %s#zftalk on Freenode%s. We\'d love to hear any questions or feedback you may have regarding the beta releases. Alternatively, you may subscribe and post questions to the %smailing lists%s.'), '<a href="irc://irc.freenode.net/zftalk">', '</a>', '<a href="http://framework.zend.com/wiki/display/ZFDEV/Mailing+Lists">', '</a>') ?></p>
-                <p><a class="btn btn-success pull-right" href="http://webchat.freenode.net?channels=zftalk" target="_blank"><?php echo $this->translate('Ping us on IRC') ?> &raquo;</a></p>
-            </div>
-        </div>
-    </div>
-</div>
+				function nivelDificil(numero, pecaComputador)
+				{
+					console.log(numero);
+					Math.floor(numero);
+					switch(numero){
+						case "1":
+        					$('#cell6').append("<div class="+pecaComputador+"></div>");
+						 default:
+							$('#cell5').append("<div class="+pecaComputador+"></div>");
+					}
+				}
+
+
+
+				// Determina se o jogador será o X ou O.
+				var numero = (Math.floor(Math.random() * 2));
+				if(numero == 0){
+					var peca = 'x';
+					var pecaComputador = 'o';
+				}else{
+					var peca = 'o';
+					var pecaComputador = 'x';
+				}
+
+				var tabuleiro = {};
+
+				// Quando o jogador clica no espaço da tabela
+				$('td').click(function(){
+
+					if($(this).is(':empty')){	
+						// Adiciona a peça na tabela
+						$(this).append("<div class="+peca+"></div>");
+
+						// Pega o número do espaço clicado 
+						celula = this.id.match(/\d+/);
+						// Coloca o número do espaço clicado no array 
+						tabuleiro[celula] = peca;
+
+						//Verifica se o Jogador ganhou, passando por parâmetro a peça
+						if(verificaTabuleiro(peca) == false){							
+							// Pega um número de 1 á 9 aleatório
+							var numero = Math.floor((Math.random() * 9) + 1);
+
+							// Se a célula estiver vazia, coloca a peça no lugar da célular
+							if($('#cell'+numero).is(':empty')){
+								// Coloca o número do espaço clicado no array
+								jogadaComputador(numero, pecaComputador, celula);
+							}else{
+								// Senão a célula estiver não estiver vazia, enquanto o número calculo da célula não for vazio, pega um número aleatório novo até achar um vazio
+								while(($('#cell'+numero).is(':empty')) == false){
+									var numero = Math.floor((Math.random() * 9) + 1);
+								}	
+								jogadaComputador(numero, pecaComputador, celula);
+							}
+
+							//Verifica se o Computador ganhou, passando por parâmetro a peça oposta
+							verificaTabuleiro(pecaComputador);
+						}
+					}
+				});
+			});
+		</script>
+		<title>Jogo da Velha</title>
+	</head>
+	<body>
+		<table border='1' id="tabelaJogo">
+			<tr>
+				<td id="cell1"></td>
+				<td id="cell2"></td>
+				<td id="cell3"></td>
+			</tr>
+			<tr>
+				<td id="cell4"></td>
+				<td id="cell5"></td>
+				<td id="cell6"></td>
+			</tr>
+			<tr>
+				<td id="cell7"></td>
+				<td id="cell8"></td>
+				<td id="cell9"></td>
+			</tr>
+		</table>
+		<a href="<?php echo $this->url('login/process', array('action'=>'logout')); ?>">Sair</a>
+	</body>
+</html>

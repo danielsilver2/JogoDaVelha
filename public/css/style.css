@@ -35,3 +35,43 @@ div.container a.brand {
     margin-left: 0;
     padding: 8px 20px 12px 40px;
 }
+
+#tabelaJogo{
+  margin: 0px auto;
+  border-collapse: collapse;
+}
+
+#tabelaJogo tr td{
+  background-color: #FFF;
+  width: 101px;
+  height: 101px;
+  border-color: #000;
+}
+
+.x{
+    height: 100px;
+    width: 100px;
+    position: relative;
+  }
+
+.x:after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    content: "\274c";
+    font-size: 80px;
+    font-weight: 0.1em; 
+    color: #000;
+    line-height: 100px;
+    text-align: center;
+}
+
+.o{
+    height: 80px;
+    width: 80px;
+    margin: auto;
+    border: 14px solid black;
+    border-radius: 100px;
+  }

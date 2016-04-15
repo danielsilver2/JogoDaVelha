@@ -3,36 +3,57 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
-
-namespace Application;
 
 return array(
     'router' => array(
         'routes' => array(
             'home' => array(
-                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'type' => 'Literal',
                 'options' => array(
-                    'route'    => '/',
+                    'route'    => '/home',
                     'defaults' => array(
                         'controller' => 'Application\Controller\Index',
                         'action'     => 'index',
                     ),
                 ),
             ),
-            // The following is a route to simplify getting started creating
-            // new controllers and actions without needing to create a new
-            // module. Simply drop new controllers in, and you can access them
-            // using the path /application/:controller/:action
-            'application' => array(
+
+            'login' => array(
                 'type'    => 'Literal',
                 'options' => array(
-                    'route'    => '/application',
+                    'route'    => '/auth',
                     'defaults' => array(
                         '__NAMESPACE__' => 'Application\Controller',
-                        'controller'    => 'Index',
+                        'controller'    => 'Auth',
+                        'action'        => 'login',
+                    ),
+                ),
+                'may_terminate' => true,
+                'child_routes' => array(
+                    'process' => array(
+                        'type'    => 'Segment',
+                        'options' => array(
+                            'route'    => '/[:action]',
+                            'constraints' => array(
+                                'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ),
+                            'defaults' => array(
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            'success' => array(
+                'type'    => 'Literal',
+                'options' => array(
+                    'route'    => '/success',
+                    'defaults' => array(
+                        '__NAMESPACE__' => 'Application\Controller',
+                        'controller'    => 'Success',
                         'action'        => 'index',
                     ),
                 ),
@@ -41,7 +62,7 @@ return array(
                     'default' => array(
                         'type'    => 'Segment',
                         'options' => array(
-                            'route'    => '/[:controller[/:action]]',
+                            'route'    => '/[:action]',
                             'constraints' => array(
                                 'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                 'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
@@ -59,8 +80,8 @@ return array(
             'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
             'Zend\Log\LoggerAbstractServiceFactory',
         ),
-        'factories' => array(
-            'translator' => 'Zend\Mvc\Service\TranslatorServiceFactory',
+        'aliases' => array(
+            'translator' => 'MvcTranslator',
         ),
     ),
     'translator' => array(
@@ -75,7 +96,9 @@ return array(
     ),
     'controllers' => array(
         'invokables' => array(
-            'Application\Controller\Index' => Controller\IndexController::class
+            'Application\Controller\Index'   => 'Application\Controller\IndexController',
+            'Application\Controller\Auth'    => 'Application\Controller\AuthController',
+            'Application\Controller\Success' => 'Application\Controller\SuccessController'
         ),
     ),
     'view_manager' => array(

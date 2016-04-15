@@ -9,17 +9,20 @@
 
 namespace Zend\View\Helper\Navigation;
 
+use Interop\Container\ContainerInterface;
 use RecursiveIteratorIterator;
+use ReflectionClass;
+use ReflectionProperty;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\SharedEventManager;
 use Zend\I18n\Translator\TranslatorInterface as Translator;
 use Zend\I18n\Translator\TranslatorAwareInterface;
 use Zend\Navigation;
 use Zend\Navigation\Page\AbstractPage;
 use Zend\Permissions\Acl;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\AbstractPluginManager;
 use Zend\View;
 use Zend\View\Exception;
 
@@ -29,18 +32,12 @@ use Zend\View\Exception;
 abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
     EventManagerAwareInterface,
     HelperInterface,
-    ServiceLocatorAwareInterface,
     TranslatorAwareInterface
 {
     /**
      * @var EventManagerInterface
      */
     protected $events;
-
-    /**
-     * @var ServiceLocatorInterface
-     */
-    protected $serviceLocator;
 
     /**
      * AbstractContainer to operate on by default
@@ -90,6 +87,11 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
      * @var string|Acl\Role\RoleInterface
      */
     protected $role;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $serviceLocator;
 
     /**
      * Whether ACL should be used for filtering out pages
@@ -143,10 +145,10 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
      * @return mixed
      * @throws Navigation\Exception\ExceptionInterface
      */
-    public function __call($method, array $arguments = array())
+    public function __call($method, array $arguments = [])
     {
         return call_user_func_array(
-            array($this->getContainer(), $method),
+            [$this->getContainer(), $method],
             $arguments
         );
     }
@@ -241,10 +243,10 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
         }
 
         if ($found) {
-            return array('page' => $found, 'depth' => $foundDepth);
+            return ['page' => $found, 'depth' => $foundDepth];
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -260,7 +262,8 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
         }
 
         if (is_string($container)) {
-            if (!$this->getServiceLocator()) {
+            $services = $this->getServiceLocator();
+            if (! $services) {
                 throw new Exception\InvalidArgumentException(sprintf(
                     'Attempted to set container with alias "%s" but no ServiceLocator was set',
                     $container
@@ -269,16 +272,8 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
 
             /**
              * Load the navigation container from the root service locator
-             *
-             * The navigation container is probably located in Zend\ServiceManager\ServiceManager
-             * and not in the View\HelperPluginManager. If the set service locator is a
-             * HelperPluginManager, access the navigation container via the main service locator.
              */
-            $sl = $this->getServiceLocator();
-            if ($sl instanceof View\HelperPluginManager) {
-                $sl = $sl->getServiceLocator();
-            }
-            $container = $sl->get($container);
+            $container = $services->get($container);
             return;
         }
 
@@ -324,7 +319,7 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
         } elseif ($this->getUseAcl()) {
             $acl = $this->getAcl();
             $role = $this->getRole();
-            $params = array('acl' => $acl, 'page' => $page, 'role' => $role);
+            $params = ['acl' => $acl, 'page' => $page, 'role' => $role];
             $accept = $this->isAllowed($params);
         }
 
@@ -347,7 +342,8 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
      */
     protected function isAllowed($params)
     {
-        $results = $this->getEventManager()->trigger(__FUNCTION__, $this, $params);
+        $events = $this->getEventManager() ?: $this->createEventManager();
+        $results = $events->trigger(__FUNCTION__, $this, $params);
         return $results->last();
     }
 
@@ -401,13 +397,13 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
         $title = $this->translate($page->getTitle(), $page->getTextDomain());
 
         // get attribs for anchor element
-        $attribs = array(
+        $attribs = [
             'id'     => $page->getId(),
             'title'  => $title,
             'class'  => $page->getClass(),
             'href'   => $page->getHref(),
             'target' => $page->getTarget()
-        );
+        ];
 
         /** @var \Zend\View\Helper\EscapeHtml $escaper */
         $escaper = $this->view->plugin('escapeHtml');
@@ -511,29 +507,30 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
      */
     public function setEventManager(EventManagerInterface $events)
     {
-        $events->setIdentifiers(array(
+        $events->setIdentifiers([
             __CLASS__,
             get_called_class(),
-        ));
+        ]);
 
         $this->events = $events;
 
-        $this->setDefaultListeners();
+        if ($events->getSharedManager()) {
+            $this->setDefaultListeners();
+        }
 
         return $this;
     }
 
     /**
-     * Get the event manager.
+     * Get the event manager, if present.
      *
-     * @return  EventManagerInterface
+     * Internally, the helper will lazy-load an EM instance the first time it
+     * requires one, but ideally it should be injected during instantiation.
+     *
+     * @return  null|EventManagerInterface
      */
     public function getEventManager()
     {
-        if (null === $this->events) {
-            $this->setEventManager(new EventManager());
-        }
-
         return $this->events;
     }
 
@@ -755,11 +752,33 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
     /**
      * Set the service locator.
      *
-     * @param  ServiceLocatorInterface $serviceLocator
+     * Used internally to pull named navigation containers to render.
+     *
+     * @param  ContainerInterface $serviceLocator
      * @return AbstractHelper
      */
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    public function setServiceLocator(ContainerInterface $serviceLocator)
     {
+        // If we are provided a plugin manager, we should pull the parent
+        // context from it.
+        // @todo We should update tests and code to ensure that this situation
+        //       doesn't happen in the future.
+        if ($serviceLocator instanceof AbstractPluginManager
+            && ! method_exists($serviceLocator, 'configure')
+            && $serviceLocator->getServiceLocator()
+        ) {
+            $serviceLocator = $serviceLocator->getServiceLocator();
+        }
+
+        // v3 variant; likely won't be needed.
+        if ($serviceLocator instanceof AbstractPluginManager
+            && method_exists($serviceLocator, 'configure')
+        ) {
+            $r = new ReflectionProperty($serviceLocator, 'creationContext');
+            $r->setAccessible(true);
+            $serviceLocator = $r->getValue($serviceLocator);
+        }
+
         $this->serviceLocator = $serviceLocator;
         return $this;
     }
@@ -767,7 +786,9 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
     /**
      * Get the service locator.
      *
-     * @return ServiceLocatorInterface
+     * Used internally to pull named navigation containers to render.
+     *
+     * @return ContainerInterface
      */
     public function getServiceLocator()
     {
@@ -937,10 +958,38 @@ abstract class AbstractHelper extends View\Helper\AbstractHtmlElement implements
             return;
         }
 
-        $this->getEventManager()->getSharedManager()->attach(
+        $events = $this->getEventManager() ?: $this->createEventManager();
+
+        if (! $events->getSharedManager()) {
+            return;
+        }
+
+        $events->getSharedManager()->attach(
             'Zend\View\Helper\Navigation\AbstractHelper',
             'isAllowed',
-            array('Zend\View\Helper\Navigation\Listener\AclListener', 'accept')
+            ['Zend\View\Helper\Navigation\Listener\AclListener', 'accept']
         );
+    }
+
+    /**
+     * Create and return an event manager instance.
+     *
+     * Ensures that the returned event manager has a shared manager
+     * composed.
+     *
+     * @return EventManager
+     */
+    private function createEventManager()
+    {
+        $r = new ReflectionClass(EventManager::class);
+        if ($r->hasMethod('setSharedManager')) {
+            $events = new EventManager();
+            $events->setSharedManager(new SharedEventManager());
+        } else {
+            $events = new EventManager(new SharedEventManager());
+        }
+
+        $this->setEventManager($events);
+        return $events;
     }
 }

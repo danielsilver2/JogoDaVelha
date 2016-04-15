@@ -15,7 +15,10 @@ use Zend\View\Model\ViewModel;
 class IndexController extends AbstractActionController
 {
     public function indexAction()
-    {
+    {	
+    	if (! $this->getServiceLocator()->get('AuthService')->hasIdentity()){
+            return $this->redirect()->toRoute('login');
+        }
         return new ViewModel();
     }
 }
