@@ -1,0 +1,35 @@
+<?php
+
+$title = 'Cadastro de Usuário';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<?php
+$form->setAttribute('action', $this->url('admin/action', array('action' => 'add')));
+$form->prepare();
+
+echo $this->form()->openTag($form);	?>
+<div class="form-group">
+	<?= $this->formRow($form->get('username'));	?>
+</div>
+<div class="form-group">
+	<?= $this->formRow($form->get('password')); ?>
+</div>
+<div class="form-group">
+	<?= $this->formRow($form->get('name')); ?>
+</div>
+<div class="form-group">
+	<?= $this->formRow($form->get('lastName')); ?>
+</div>
+<div class="form-group">
+	<?= $this->formRow($form->get('age')); ?>
+</div>
+<div class="form-group">
+	<?= $this->formRow($form->get('city')); ?>
+</div>
+<b>Campos com  * são obrigatórios</b><br />
+<?php
+	echo $this->formSubmit($form->get('submit'));
+	echo $this->form()->closeTag();
+?>
+<a href="<?php echo $this->url('login');?>"><button class="btn btn-warning">Voltar</button></a>

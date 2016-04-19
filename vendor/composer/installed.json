@@ -4715,5 +4715,51 @@
             "persistence",
             "spl"
         ]
+    },
+    {
+        "name": "itrascastro/acl",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/itrascastro/TrascastroACL.git",
+            "reference": "38832a2c29afe0e39a262d7e76c94fed4bc44e01"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/itrascastro/TrascastroACL/zipball/38832a2c29afe0e39a262d7e76c94fed4bc44e01",
+            "reference": "38832a2c29afe0e39a262d7e76c94fed4bc44e01",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "time": "2015-03-10 17:00:08",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "TrascastroACL": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Ismael Trascastro",
+                "email": "itrascastro@gmail.com",
+                "homepage": "http://www.ismaeltrascastro.com",
+                "role": "Developer"
+            }
+        ],
+        "description": "Easy ACL. Avoid handwriting ACL permissions in Zend Framework",
+        "homepage": "https://github.com/itrascastro/TrascastroACL",
+        "keywords": [
+            "Zend Framework",
+            "acl",
+            "module"
+        ]
     }
 ]

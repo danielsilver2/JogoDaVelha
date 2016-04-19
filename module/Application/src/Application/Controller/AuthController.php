@@ -5,8 +5,11 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Form\Annotation\AnnotationBuilder;
 use Zend\View\Model\ViewModel;
+use Zend\Authentication\Storage\Session as SessionStorage;
+use Zend\Session\Container;
 
 use Application\Model\User;
+use Application\Form\UserForm;
 
 class AuthController extends AbstractActionController
 {
@@ -14,9 +17,10 @@ class AuthController extends AbstractActionController
     protected $storage;
     protected $authservice;
 
+
     public function getAuthService()
     {
-        if (! $this->authservice) {
+        if (!$this->authservice) {
             $this->authservice = $this->getServiceLocator()
                                       ->get('AuthService');
         }
@@ -26,7 +30,7 @@ class AuthController extends AbstractActionController
 
     public function getSessionStorage()
     {
-        if (! $this->storage) {
+        if ( $this->storage) {
             $this->storage = $this->getServiceLocator()
                                   ->get('Application\Model\MyAuthStorage');
         }
@@ -37,9 +41,11 @@ class AuthController extends AbstractActionController
     public function getForm()
     {
         if (! $this->form) {
-            $user       = new User();
-            $builder    = new AnnotationBuilder();
-            $this->form = $builder->createForm($user);
+            // $user       = new User();
+            // $builder    = new AnnotationBuilder();
+            // $this->form = $builder->createForm($user);
+            $form = new UserForm();
+            $this->form = $form;
         }
 
         return $this->form;
@@ -47,9 +53,8 @@ class AuthController extends AbstractActionController
 
     public function loginAction()
     {
-        //if already login, redirect to success page
         if ($this->getAuthService()->hasIdentity()){
-            return $this->redirect()->toRoute('success');
+            return $this->redirect()->toRoute('admin');
         }
 
         $form       = $this->getForm();
@@ -69,7 +74,6 @@ class AuthController extends AbstractActionController
         if ($request->isPost()){
             $form->setData($request->getPost());
             if ($form->isValid()){
-                //check authentication...
                 $this->getAuthService()->getAdapter()
                                        ->setIdentity($request->getPost('username'))
                                        ->setCredential($request->getPost('password'));
@@ -77,20 +81,19 @@ class AuthController extends AbstractActionController
                 $result = $this->getAuthService()->authenticate();
                 foreach($result->getMessages() as $message)
                 {
-                    //save message temporary into flashmessenger
                     $this->flashmessenger()->addMessage($message);
                 }
 
                 if ($result->isValid()) {
-                    $redirect = 'success';
-                    //check if it has rememberMe :
+                    $redirect = 'admin';
                     if ($request->getPost('rememberme') == 1 ) {
                         $this->getSessionStorage()
                              ->setRememberMe(1);
-                        //set storage again
                         $this->getAuthService()->setStorage($this->getSessionStorage());
                     }
                     $this->getAuthService()->getStorage()->write($request->getPost('username'));
+                    $userSession = new Container('user');
+                    $userSession->username = $request->getPost('username');
                 }
             }
         }
@@ -100,10 +103,9 @@ class AuthController extends AbstractActionController
 
     public function logoutAction()
     {
-        $this->getSessionStorage()->forgetMe();
         $this->getAuthService()->clearIdentity();
 
         $this->flashmessenger()->addMessage("Você foi deslogado");
-        return $this->redirect()->toRoute('login');
+        $this->redirect()->toRoute('login');
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Application\Model;
 
-use Zend\Authentication\Storage;
+use Zend\Authentication\Storage\Session;
 
-class MyAuthStorage extends Storage\Session
+class MyAuthStorage extends Session
 {
     public function setRememberMe($rememberMe = 0, $time = 1209600)
     {

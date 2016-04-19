@@ -13,7 +13,7 @@ return array(
             'home' => array(
                 'type' => 'Literal',
                 'options' => array(
-                    'route'    => '/home',
+                    'route'    => '/',
                     'defaults' => array(
                         'controller' => 'Application\Controller\Index',
                         'action'     => 'index',
@@ -47,19 +47,19 @@ return array(
                     ),
                 ),
             ),
-            'success' => array(
+            'admin' => array(
                 'type'    => 'Literal',
                 'options' => array(
-                    'route'    => '/success',
+                    'route'    => '/admin',
                     'defaults' => array(
                         '__NAMESPACE__' => 'Application\Controller',
-                        'controller'    => 'Success',
+                        'controller'    => 'Admin',
                         'action'        => 'index',
                     ),
                 ),
                 'may_terminate' => true,
                 'child_routes' => array(
-                    'default' => array(
+                    'action' => array(
                         'type'    => 'Segment',
                         'options' => array(
                             'route'    => '/[:action]',
@@ -68,6 +68,53 @@ return array(
                                 'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ),
                             'defaults' => array(
+                                '__NAMESPACE__'     => 'Application\Controller',
+                                'controller'        => 'Admin',
+                                'action'            => 'index',
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            'user' => array(
+                'type'    => 'Literal',
+                'options' => array(
+                    'route'    => '/user',
+                    'defaults' => array(
+                        '__NAMESPACE__' => 'Application\Controller',
+                        'controller'    => 'User',
+                        'action'        => 'index',
+                    ),
+                ),
+                'may_terminate' => true,
+                'child_routes' => array(
+                    'action' => array(
+                        'type'    => 'Segment',
+                        'options' => array(
+                            'route'    => '/[:action]',
+                            'constraints' => array(
+                                'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ),
+                            'defaults' => array(
+                                '__NAMESPACE__'     => 'Application\Controller',
+                                'controller'        => 'User',
+                                'action'            => 'index',
+                            ),
+                        ),
+                    ),
+                    'play' => array(
+                        'type'    => 'Segment',
+                        'options' => array(
+                            'route'    => '/play',
+                            'constraints' => array(
+                                'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ),
+                            'defaults' => array(
+                                '__NAMESPACE__'     => 'Application\Controller',
+                                'controller'        => 'Play',
+                                'action'            => 'index',
                             ),
                         ),
                     ),
@@ -98,7 +145,10 @@ return array(
         'invokables' => array(
             'Application\Controller\Index'   => 'Application\Controller\IndexController',
             'Application\Controller\Auth'    => 'Application\Controller\AuthController',
-            'Application\Controller\Success' => 'Application\Controller\SuccessController'
+            'Application\Controller\Success' => 'Application\Controller\SuccessController',
+            'Application\Controller\Admin'   => 'Application\Controller\AdminController',
+            'Application\Controller\User'   => 'Application\Controller\UserController',
+            'Application\Controller\Play'   => 'Application\Controller\PlayController'
         ),
     ),
     'view_manager' => array(

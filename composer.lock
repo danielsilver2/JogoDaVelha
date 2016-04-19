@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "774ada357424efc2c6b84c139104e6d5",
-    "content-hash": "6be82ad58648489bb49c021c92ab48d1",
+    "hash": "5c4321b5aeef6bec29cd52b4f09d4067",
+    "content-hash": "b3233494121d4929c3cf73456db9e313",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -485,6 +485,50 @@
                 "parser"
             ],
             "time": "2014-09-09 13:34:57"
+        },
+        {
+            "name": "itrascastro/acl",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/itrascastro/TrascastroACL.git",
+                "reference": "38832a2c29afe0e39a262d7e76c94fed4bc44e01"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/itrascastro/TrascastroACL/zipball/38832a2c29afe0e39a262d7e76c94fed4bc44e01",
+                "reference": "38832a2c29afe0e39a262d7e76c94fed4bc44e01",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "TrascastroACL": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ismael Trascastro",
+                    "email": "itrascastro@gmail.com",
+                    "homepage": "http://www.ismaeltrascastro.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Easy ACL. Avoid handwriting ACL permissions in Zend Framework",
+            "homepage": "https://github.com/itrascastro/TrascastroACL",
+            "keywords": [
+                "Zend Framework",
+                "acl",
+                "module"
+            ],
+            "time": "2015-03-10 17:00:08"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -4565,7 +4609,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "zendframework/zendframework": 5
+        "itrascastro/acl": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				
+
+				function verificaTabuleiro(peca)
+				{
+
+					// Lógica para ganhar verificar se ganhou um jogo
+					// Lógica nas linhas
+					if(($('#cell1').find("."+peca).length > 0) && ($('#cell2').find("."+peca).length > 0) && ($('#cell3').find("."+peca).length > 0)){
+							alert(peca+' ganhou');
+							return true;
+						}else if(($('#cell4').find("."+peca).length > 0) && ($('#cell5').find("."+peca).length > 0) && ($('#cell6').find("."+peca).length > 0)){
+								alert(peca+' ganhou');
+								return true;
+							}else if(($('#cell7').find("."+peca).length > 0) && ($('#cell8').find("."+peca).length > 0) && ($('#cell9').find("."+peca).length > 0)){
+									alert(peca+' ganhou');
+									return true;
+								// Lógica nas colunas
+								}else if(($('#cell1').find("."+peca).length > 0) && ($('#cell4').find("."+peca).length > 0) && ($('#cell7').find("."+peca).length > 0)){
+										alert(peca+' ganhou');
+										return true;
+									}else if(($('#cell2').find("."+peca).length > 0) && ($('#cell5').find("."+peca).length > 0) && ($('#cell8').find("."+peca).length > 0)){
+											alert(peca+' ganhou');
+											return true;
+										}else if(($('#cell3').find("."+peca).length > 0) && ($('#cell6').find("."+peca).length > 0) && ($('#cell9').find("."+peca).length > 0)){
+												alert(peca+' ganhou');
+												return true;
+											
+											}else if(($('#cell1').find("."+peca).length > 0) && ($('#cell5').find("."+peca).length > 0) && ($('#cell9').find("."+peca).length > 0)){
+													alert(peca+' ganhou');
+													return true;
+												}else if(($('#cell3').find("."+peca).length > 0) && ($('#cell5').find("."+peca).length > 0) && ($('#cell7').find("."+peca).length > 0)){
+														alert(peca+' ganhou');
+														return true;
+													}else{
+															return false
+													}
+				}
+
+				function jogadaComputador(numero, pecaComputador, numeroJogador)
+				{
+					// $('#cell'+numero).append("<div class="+pecaComputador+"></div>");
+					// Coloca o número do espaço clicado no array 
+					tabuleiro[numero] = pecaComputador;
+					nivelDificil(numeroJogador, pecaComputador);
+				}
+
+				function nivelDificil(numero, pecaComputador)
+				{
+					console.log(numero);
+					Math.floor(numero);
+					switch(numero){
+						case 1:
+        					$('#cell6').append("<div class="+pecaComputador+"></div>");
+						 default:
+							$('#cell5').append("<div class="+pecaComputador+"></div>");
+					}
+				}
+
+
+
+				// Determina se o jogador será o X ou O.
+				var numero = (Math.floor(Math.random() * 2));
+				if(numero == 0){
+					var peca = 'x';
+					var pecaComputador = 'o';
+				}else{
+					var peca = 'o';
+					var pecaComputador = 'x';
+				}
+
+				var tabuleiro = {};
+
+				// Quando o jogador clica no espaço da tabela
+				$('td').click(function(){
+
+					if($(this).is(':empty')){	
+						// Adiciona a peça na tabela
+						$(this).append("<div class="+peca+"></div>");
+
+						// Pega o número do espaço clicado 
+						celula = this.id.match(/\d+/);
+						// Coloca o número do espaço clicado no array 
+						tabuleiro[celula] = peca;
+
+						//Verifica se o Jogador ganhou, passando por parâmetro a peça
+						if(verificaTabuleiro(peca) == false){							
+							// Pega um número de 1 á 9 aleatório
+							var numero = Math.floor((Math.random() * 9) + 1);
+
+							// Se a célula estiver vazia, coloca a peça no lugar da célular
+							if($('#cell'+numero).is(':empty')){
+								// Coloca o número do espaço clicado no array
+								jogadaComputador(numero, pecaComputador, celula);
+							}else{
+								// Senão a célula estiver não estiver vazia, enquanto o número calculo da célula não for vazio, pega um número aleatório novo até achar um vazio
+								while(($('#cell'+numero).is(':empty')) == false){
+									var numero = Math.floor((Math.random() * 9) + 1);
+								}	
+								jogadaComputador(numero, pecaComputador, celula);
+							}
+
+							//Verifica se o Computador ganhou, passando por parâmetro a peça oposta
+							verificaTabuleiro(pecaComputador);
+						}
+					}
+				});
+			});
+		</script>
+		<title>Jogo da Velha</title>
+		<h1>Jogo da Velha</h1>
+		<p>Jogando contra <b><?php echo $this->user->username; ?> </b></p>
+	</head>
+	<body>
+		<form action='' method='post'>
+			<table border='1' id="tabelaJogo">
+				<tr>
+					<td id="cell11"><?php echo $peca; ?></td>
+					<td id="cell12"></td>
+					<td id="cell13"></td>
+				</tr>
+				<tr>
+					<td id="cell21"></td>
+					<td id="cell22"></td>
+					<td id="cell23"></td>
+				</tr>
+				<tr>
+					<td id="cell31"></td>
+					<td id="cell32"></td>
+					<td id="cell33"></td>
+				</tr>
+			</table>
+		</form>
+		<p><a href="<?php echo $this->url('login/process', array('action'=>'logout')); ?>">Sair</a></p>
+		<a href="<?php echo $this->url('user')?>">Voltar</a>
+	</body>
+</html>
